@@ -8,6 +8,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CardDAO {
 
@@ -75,6 +77,30 @@ public class CardDAO {
             pstmt.executeUpdate();
         }
     }
+
+    // Get ALL cards from database
+public List<Card> readAllCards() throws SQLException {
+    String sql = "SELECT * FROM Card";
+    List<Card> cards = new ArrayList<>();
+    
+    try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+        ResultSet rs = pstmt.executeQuery();
+        while (rs.next()) {
+            Card card = new Card(
+                rs.getString("first_Name"),
+                rs.getString("last_Name"),
+                rs.getDouble("height"),
+                rs.getDouble("weight"),
+                rs.getString("position"),
+                rs.getString("team"),
+                rs.getDouble("batting_Average")
+            );
+            cards.add(card);
+        }
+    }
+    return cards;
+}
+    
 
     // CRUD operations for CardStyle
     public void createCardStyle(CardStyle cardStyle) throws SQLException {
