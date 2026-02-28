@@ -193,4 +193,5 @@ public List<Card> readAllCards() throws SQLException {
             pstmt.executeUpdate();
         }
     }
+    
 }

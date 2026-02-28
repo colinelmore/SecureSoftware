@@ -33,6 +33,7 @@ import com.baseballcards.models.FindCard;
  */
 @RestController
 @RequestMapping("/api/cards")
+@CrossOrigin(origins = "*")
 public class CardServiceController {
 
     // This connects us to the business layer

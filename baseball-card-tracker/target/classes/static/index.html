@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Baseball Card Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <h1>⚾ Baseball Card Tracker</h1>
+            <p>Manage your baseball card collection</p>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="container">
+            <button class="nav-btn active" onclick="showSection('all-cards')">All Cards</button>
+            <button class="nav-btn" onclick="showSection('create-card')">Create Card</button>
+            <button class="nav-btn" onclick="showSection('edit-card')">Edit Card</button>
+            <button class="nav-btn" onclick="showSection('search-card')">Search Card</button>
+            <button class="nav-btn" onclick="showSection('card-styles')">Card Styles</button>
+            <button class="nav-btn" onclick="showSection('find-cards')">Find Cards</button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container">
+        
+        <!-- ALL CARDS SECTION -->
+        <section id="all-cards" class="content-section active">
+            <div class="section-header">
+                <h2>All Baseball Cards</h2>
+                <button class="refresh-btn" onclick="loadAllCards()">🔄 Refresh</button>
+            </div>
+            <div id="cards-grid" class="cards-grid">
+                <div class="loading">Loading cards...</div>
+            </div>
+            <div id="no-cards" class="no-data" style="display: none;">
+                No cards found in the database.
+            </div>
+        </section>
+
+        <!-- CREATE CARD SECTION -->
+        <section id="create-card" class="content-section">
+            <div class="section-header">
+                <h2>Create New Baseball Card</h2>
+            </div>
+            <div class="form-container">
+                <form id="create-form" onsubmit="createCard(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="create-firstname">First Name *</label>
+                            <input type="text" id="create-firstname" required placeholder="e.g., Mike">
+                        </div>
+                        <div class="form-group">
+                            <label for="create-lastname">Last Name *</label>
+                            <input type="text" id="create-lastname" required placeholder="e.g., Trout">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="create-height">Height (inches) *</label>
+                            <input type="number" id="create-height" step="0.1" required placeholder="e.g., 74">
+                        </div>
+                        <div class="form-group">
+                            <label for="create-weight">Weight (lbs) *</label>
+                            <input type="number" id="create-weight" step="0.1" required placeholder="e.g., 235">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="create-position">Position *</label>
+                            <input type="text" id="create-position" required placeholder="e.g., OF, 1B, P">
+                        </div>
+                        <div class="form-group">
+                            <label for="create-team">Team *</label>
+                            <input type="text" id="create-team" required placeholder="e.g., Angels">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="create-batting">Batting Average (0-1) *</label>
+                        <input type="number" id="create-batting" step="0.001" min="0" max="1" required placeholder="e.g., 0.305">
+                    </div>
+                    
+                    <button type="submit" class="btn-primary btn-large">Create Card</button>
+                    <button type="button" class="btn-secondary btn-large" onclick="resetCreateForm()">Clear Form</button>
+                </form>
+                <div id="create-result"></div>
+            </div>
+        </section>
+
+        <!-- EDIT CARD SECTION -->
+        <section id="edit-card" class="content-section">
+            <div class="section-header">
+                <h2>Edit Baseball Card</h2>
+            </div>
+            
+            <!-- Step 1: Search for card to edit -->
+            <div class="form-container">
+                <h3>Step 1: Find the card to edit</h3>
+                <div class="search-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="edit-search-firstname">First Name:</label>
+                            <input type="text" id="edit-search-firstname" placeholder="e.g., Mike">
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-search-lastname">Last Name:</label>
+                            <input type="text" id="edit-search-lastname" placeholder="e.g., Trout">
+                        </div>
+                    </div>
+                    <button class="btn-primary" onclick="loadCardForEdit()">Load Card</button>
+                </div>
+                
+                <!-- Step 2: Edit form (hidden until card is loaded) -->
+                <div id="edit-form-container" style="display: none;">
+                    <h3>Step 2: Update the card information</h3>
+                    <form id="edit-form" onsubmit="updateCard(event)">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="edit-firstname">First Name (read-only)</label>
+                                <input type="text" id="edit-firstname" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label for="edit-lastname">Last Name (read-only)</label>
+                                <input type="text" id="edit-lastname" readonly>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="edit-height">Height (inches) *</label>
+                                <input type="number" id="edit-height" step="0.1" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="edit-weight">Weight (lbs) *</label>
+                                <input type="number" id="edit-weight" step="0.1" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="edit-position">Position *</label>
+                                <input type="text" id="edit-position" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="edit-team">Team *</label>
+                                <input type="text" id="edit-team" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="edit-batting">Batting Average (0-1) *</label>
+                            <input type="number" id="edit-batting" step="0.001" min="0" max="1" required>
+                        </div>
+                        
+                        <button type="submit" class="btn-primary btn-large">Update Card</button>
+                        <button type="button" class="btn-secondary btn-large" onclick="cancelEdit()">Cancel</button>
+                    </form>
+                </div>
+                
+                <div id="edit-result"></div>
+            </div>
+        </section>
+
+        <!-- SEARCH CARD SECTION -->
+        <section id="search-card" class="content-section">
+            <div class="section-header">
+                <h2>Search for a Card</h2>
+            </div>
+            <div class="search-form">
+                <div class="form-group">
+                    <label for="search-firstname">First Name:</label>
+                    <input type="text" id="search-firstname" placeholder="e.g., Mike">
+                </div>
+                <div class="form-group">
+                    <label for="search-lastname">Last Name:</label>
+                    <input type="text" id="search-lastname" placeholder="e.g., Trout">
+                </div>
+                <button class="btn-primary" onclick="searchCard()">Search</button>
+            </div>
+            <div id="search-result"></div>
+        </section>
+
+        <!-- CARD STYLES SECTION -->
+        <section id="card-styles" class="content-section">
+            <div class="section-header">
+                <h2>Card Styles</h2>
+            </div>
+            <div class="search-form">
+                <div class="form-group">
+                    <label for="style-id">Style ID:</label>
+                    <input type="number" id="style-id" placeholder="Enter style ID">
+                </div>
+                <button class="btn-primary" onclick="getCardStyle()">Get Style</button>
+            </div>
+            <div id="style-result"></div>
+        </section>
+
+        <!-- FIND CARDS SECTION -->
+        <section id="find-cards" class="content-section">
+            <div class="section-header">
+                <h2>Find Card Entries</h2>
+            </div>
+            <div class="search-form">
+                <div class="form-group">
+                    <label for="find-firstname">First Name:</label>
+                    <input type="text" id="find-firstname" placeholder="e.g., Aaron">
+                </div>
+                <div class="form-group">
+                    <label for="find-lastname">Last Name:</label>
+                    <input type="text" id="find-lastname" placeholder="e.g., Judge">
+                </div>
+                <button class="btn-primary" onclick="getFindCard()">Search</button>
+            </div>
+            <div id="find-result"></div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Baseball Card Tracker | CSCE 548 Project 3</p>
+        </div>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>
